@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Swiftss VR Lab V5 — Meta Quest 3S</title>
-    <!-- Официальное VR-ядро, оптимизированное под Quest 3/3S -->
-    <script src="https://aframe.io"></script>
+    <title>Swiftss VR Lab V6 — Meta Quest 3S</title>
+    <!-- Локальное VR-ядро, которое Гитхаб и Квест больше не заблокируют! -->
+    <script src="aframe.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden; background-color: #000;">
 
@@ -15,9 +15,9 @@
         <!-- Жесткий пол лаборатории -->
         <a-plane position="0 0 0" rotation="-90 0 0" width="50" height="50" color="#0f0f13"></a-plane>
         
-        <!-- Световая разметка пола для трекинга линз -->
+        <!-- Зеленая разметка пола для калибровки трекинга Quest 3S -->
         
-        
+        </a-weight>
         
         
 
@@ -25,12 +25,12 @@
         
             <a-sphere position="0 1.4 0" radius="0.15" color="#FFFFFF"></a-sphere>
             
-            <!-- Глаза-скобки и рот Epic Face на лице Кентиса -->
+            <!-- Легендарный Epic Face в VR пространстве -->
             <a-ring position="-0.05 1.42 0.13" radius-inner="0.01" radius-outer="0.03" color="#000000" theta-length="180" theta-start="180"></a-ring>
             <a-ring position="0.06 1.42 0.13" radius-inner="0.01" radius-outer="0.03" color="#000000" theta-length="180" theta-start="180"></a-ring>
             <a-ring position="0 1.34 0.13" radius-inner="0" radius-outer="0.06" color="#801830" theta-length="180" theta-start="180"></a-ring>
 
-            <!-- Прическа Горшок Кентиса -->
+            <!-- Фирменная прическа Горшок -->
             <a-sphere position="0 1.46 0" radius="0.16" color="#141416" theta-length="90"></a-sphere>
             <a-cylinder position="0 0.95 0" radius="0.13" height="0.5" color="#16161a"></a-cylinder>
             
@@ -47,14 +47,13 @@
             <a-sphere position="0.07 0.08 0.02" radius="0.05" color="#111111"></a-sphere>
         
 
-        <!-- 3D МОДЕЛЬ КОТЕНКА НЮНИ В 2 СТРОЧКИ ВЫСОТОЙ (Тег лапки полностью ИСПРАВЛЕН!) -->
+        <!-- 3D МОДЕЛЬ КОТЕНКА НЮНИ В 2 СТРОЧКИ ВЫСОТОЙ -->
         
             <a-sphere position="0 0.1 0" radius="0.1" scale="1 0.7 0.7" color="#FFFFFF"></a-sphere>
             <a-sphere position="-0.1 0.15 0" radius="0.07" color="#FFFFFF"></a-sphere>
             <a-cone position="-0.13 0.21 0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 15"></a-cone>
             <a-cone position="-0.1 0.21 -0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 -15"></a-cone>
             
-            <!-- Лапки закрываются строго через a-cylinder! -->
             <a-cylinder position="-0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
             <a-cylinder position="-0.05 0.03 -0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
             <a-cylinder position="0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
@@ -63,14 +62,14 @@
             <a-cylinder position="0.09 0.13 0" radius="0.008" height="0.1" color="#000000" rotation="45 0 0"></a-cylinder>
         
 
-        <!-- VR-МОНИТОР FRUKT -->
+        <!-- ПАРЯЩИЙ VR-МОНИТОР FRUKT -->
         
             <a-plane width="1.2" height="0.6" color="#0a0404" opacity="0.85"></a-plane>
             <a-box width="1.22" height="0.62" depth="0.005" color="#ff3333" wireframe="true"></a-box>
-            <a-text value="KENTISS_VR_MONITOR_v5.0" position="-0.55 0.2 0.01" color="#ff3333" width="2.4"></a-text>
+            <a-text value="KENTISS_VR_MONITOR_v6.0" position="-0.55 0.2 0.01" color="#ff3333" width="2.4"></a-text>
             <a-text value="> AI_BRAIN: 100% (STABLE)" position="-0.55 0.05 0.01" color="#00ff66" width="1.8"></a-text>
             <a-text value="> HEART_HP: 100% (75 BPM)" position="-0.55 -0.05 0.01" color="#00ff66" width="1.8"></a-text>
-            <a-text value="> QUEST_3S: LINK_ESTABLISHED" position="-0.55 -0.18 0.01" color="#ff9900" width="1.5"></a-text>
+            <a-text value="> QUEST_3S: LOCAL_LINK" position="-0.55 -0.18 0.01" color="#ff9900" width="1.5"></a-text>
         
 
         
