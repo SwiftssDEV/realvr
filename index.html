@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Swiftss VR Lab V3</title>
+    <title>Swiftss VR Lab V4 — Meta Quest 3S</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; }
         #vr-btn {
@@ -19,7 +19,6 @@
     <canvas id="vrCanvas" style="width:100vw; height:100vh;"></canvas>
 
     <script>
-        // Чистый WebGL VR Движок без внешних CDN библиотек!
         const canvas = document.getElementById('vrCanvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
         
@@ -28,7 +27,7 @@
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
 
-        // Простейшие хакерские шейдеры для рендеринга 3D в VR
+        // Исправленные шейдеры: теперь uMatrix честно принимает готовую финальную VR-матрицу
         const vsSource = `
             attribute vec4 aPosition; attribute vec4 aColor;
             uniform mat4 uMatrix; varying vec4 vColor;
@@ -46,25 +45,29 @@
         const fs = initShader(gl, fsSource, gl.FRAGMENT_SHADER);
         const program = gl.createProgram(); gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); gl.useProgram(program);
 
-        // Вершины для отрисовки Кентиса, Нюни и парящей FRUKT-платформы
+        // Геометрия Кентиса и Нюни в 3D координатах
         const vertices = new Float32Array([
-            // Земля / Пол (Темно-серый)
-            -10, 0, -10,  0.1, 0.1, 0.1, 1,   10, 0, -10,  0.1, 0.1, 0.1, 1,  -10, 0,  10,  0.1, 0.1, 0.1, 1,
-             10, 0, -10,  0.1, 0.1, 0.1, 1,   10, 0,  10,  0.1, 0.1, 0.1, 1,  -10, 0,  10,  0.1, 0.1, 0.1, 1,
-            // 3D Торс Кентиса (Черный прямоугольный блок V18)
-            -0.15, 0.7, -2,  0.08, 0.08, 0.1, 1,  0.15, 0.7, -2,  0.08, 0.08, 0.1, 1, -0.15, 1.3, -2,  0.08, 0.08, 0.1, 1,
-             0.15, 0.7, -2,  0.08, 0.08, 0.1, 1,  0.15, 1.3, -2,  0.08, 0.08, 0.1, 1, -0.15, 1.3, -2,  0.08, 0.08, 0.1, 1,
-            // Белая маска Головы Кентиса
-            -0.12, 1.3, -2,  1, 1, 1, 1,  0.12, 1.3, -2,  1, 1, 1, 1, -0.12, 1.55, -2,  1, 1, 1, 1,
-             0.12, 1.3, -2,  1, 1, 1, 1,  0.12, 1.55, -2,  1, 1, 1, 1, -0.12, 1.55, -2,  1, 1, 1, 1,
-            // Прическа Горшок (Черная полоса сверху головы)
-            -0.13, 1.5, -2,  0.05, 0.05, 0.07, 1,  0.13, 1.5, -2,  0.05, 0.05, 0.07, 1, -0.13, 1.62, -2,  0.05, 0.05, 0.07, 1,
-             0.13, 1.5, -2,  0.05, 0.05, 0.07, 1,  0.13, 1.62, -2,  0.05, 0.05, 0.07, 1, -0.13, 1.62, -2,  0.05, 0.05, 0.07, 1,
-            // Маленький котенок Нюня на полу (Бело-розовый кубик в 2 строчки)
-             0.4, 0, -1.7,  1, 1, 1, 1,   0.55, 0, -1.7,  1, 1, 1, 1,   0.4, 0.15, -1.7,  1, 1, 1, 1,
-             0.55, 0, -1.7,  1, 1, 1, 1,   0.55, 0.15, -1.7,  1, 1, 1, 1,   0.4, 0.15, -1.7,  1, 1, 1, 1,
-            // Ушки Нюни (Розовые пиксели)
-             0.42, 0.15, -1.7,  1, 0.7, 0.7, 1,  0.45, 0.2, -1.7,  1, 0.7, 0.7, 1,  0.45, 0.15, -1.7,  1, 0.7, 0.7, 1
+            // Световая неоновая разметка пола лаборатории (Зеленая сетка, чтобы ты видел, где стоишь)
+            -2, 0, -5,  0, 1, 0, 1,   2, 0, -5,  0, 1, 0, 1,  -2, 0.01, -1,  0, 1, 0, 1,
+             2, 0, -5,  0, 1, 0, 1,   2, 0, -1,  0, 1, 0, 1,  -2, 0.01, -1,  0, 1, 0, 1,
+            
+            // 3D Торс Кентиса V18 (Черная тактическая футболка ровно перед тобой на расстоянии 2 метров)
+            -0.2, 0.6, -2,  0.08, 0.08, 0.1, 1,   0.2, 0.6, -2,  0.08, 0.08, 0.1, 1,  -0.2, 1.2, -2,  0.08, 0.08, 0.1, 1,
+             0.2, 0.6, -2,  0.08, 0.08, 0.1, 1,   0.2, 1.2, -2,  0.08, 0.08, 0.1, 1,  -0.2, 1.2, -2,  0.08, 0.08, 0.1, 1,
+            
+            // Белая маска Головы Кентиса (Epic Face основа)
+            -0.15, 1.2, -2,  1, 1, 1, 1,   0.15, 1.2, -2,  1, 1, 1, 1,  -0.15, 1.5, -2,  1, 1, 1, 1,
+             0.15, 1.2, -2,  1, 1, 1, 1,   0.15, 1.5, -2,  1, 1, 1, 1,  -0.15, 1.5, -2,  1, 1, 1, 1,
+            
+            // Фирменная прическа Горшок Кентиса (Черный блок оверсайз челки)
+            -0.16, 1.45, -2,  0.07, 0.07, 0.09, 1,   0.16, 1.45, -2,  0.07, 0.07, 0.09, 1,  -0.16, 1.58, -2,  0.07, 0.07, 0.09, 1,
+             0.16, 1.45, -2,  0.07, 0.07, 0.09, 1,   0.16, 1.58, -2,  0.07, 0.07, 0.09, 1,  -0.16, 1.58, -2,  0.07, 0.07, 0.09, 1,
+            
+            // Мелкий котенок Нюня на полу (Бело-розовый пушистик в 2 строчки высотой)
+             0.35, 0, -1.6,  1, 1, 1, 1,   0.5, 0, -1.6,  1, 1, 1, 1,   0.35, 0.15, -1.6,  1, 1, 1, 1,
+             0.5, 0, -1.6,  1, 1, 1, 1,   0.5, 0.15, -1.6,  1, 1, 1, 1,   0.35, 0.15, -1.6,  1, 1, 1, 1,
+            // Розовые микро-ушки Нюни
+             0.37, 0.15, -1.6,  1, 0.6, 0.6, 1,  0.4, 0.22, -1.6,  1, 0.6, 0.6, 1,  0.4, 0.15, -1.6,  1, 0.6, 0.6, 1
         ]);
 
         const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
@@ -74,29 +77,22 @@
         const aColor = gl.getAttribLocation(program, 'aColor'); gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, FSIZE * 7, FSIZE * 3); gl.enableVertexAttribArray(aColor);
         const uMatrix = gl.getUniformLocation(program, 'uMatrix');
 
-        // Матрица проекции для имитации 3D взгляда
-        let angle = 0;
-        function renderScene(matrix) {
-            gl.clearColor(0.02, 0.02, 0.03, 1.0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST);
-            gl.uniformMatrix4fv(uMatrix, false, matrix); gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 7);
+        // Вспомогательная хакерская функция для перемножения 3D-матриц шлема (Убирает слепоту линз)
+        function multiplyMatrices(out, a, b) {
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    out[i * 4 + j] = b[i * 4 + 0] * a[0 * 4 + j] + b[i * 4 + 1] * a[1 * 4 + j] + b[i * 4 + 2] * a[2 * 4 + j] + b[i * 4 + 3] * a[3 * 4 + j];
+                }
+            }
         }
 
-        // Стандартная матрица идентичности
-        let baseMatrix = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-        renderScene(baseMatrix);
-
-        // Запуск официальной WebXR сессии при клике по кнопке в шлеме Meta Quest
-        let xrSession = null;
-        let xrRefSpace = null;
+        let xrSession = null; let xrRefSpace = null;
 
         function activateVR() {
-            if (!navigator.xr) { alert("Ваш браузер не поддерживает VR. Откройте страницу ИМЕННО внутри Meta Quest 3S!"); return; }
-            
+            if (!navigator.xr) { alert("Открой страницу внутри Meta Quest 3S!"); return; }
             navigator.xr.requestSession('immersive-vr', { requiredFeatures: ['local-floor'] }).then(session => {
                 xrSession = session;
                 document.getElementById('vr-btn').style.display = 'none';
-                
-                // Подключаем хакерский WebGL слой шлема
                 gl.makeXRCompatible().then(() => {
                     xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, gl) });
                     xrSession.requestReferenceSpace('local-floor').then(refSpace => {
@@ -104,10 +100,11 @@
                         xrSession.requestAnimationFrame(onXRFrame);
                     });
                 });
-            }).catch(err => { alert("Ошибка входа в VR: " + err.message); });
+            }).catch(err => { alert("Ошибка VR: " + err.message); });
         }
 
-        // Бесконечный цикл рендеринга внутри линз Meta Quest 3S
+        const eyeMatrix = new Float32Array(16); // Буфер для финальной матрицы глаза
+
         function onXRFrame(time, frame) {
             let session = frame.session;
             session.requestAnimationFrame(onXRFrame);
@@ -116,14 +113,21 @@
             if (pose) {
                 let glLayer = session.renderState.baseLayer;
                 gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer);
+                
+                // Очищаем VR пространство темнотой
+                gl.clearColor(0.03, 0.03, 0.05, 1.0); 
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
+                gl.enable(gl.DEPTH_TEST);
 
-                // Рендерим картинку отдельно для левого и правого глаза шлема
                 for (let view of pose.views) {
                     let viewport = glLayer.getViewport(view);
                     gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
                     
-                    // Передаем реальную 3D-матрицу шлема в наш шейдер костей Кентиса
-                    gl.uniformMatrix4fv(uMatrix, false, view.transform.inverse.matrix);
+                    // ГЕОМЕТРИЧЕСКИЙ ФИКС: Скрещиваем матрицу проекции линзы и инверсию взгляда шлема
+                    multiplyMatrices(eyeMatrix, view.projectionMatrix, view.transform.inverse.matrix);
+                    
+                    // Отправляем готовую матрицу в шейдер — Кентис и Нюня теперь попадут в фокус Квеста!
+                    gl.uniformMatrix4fv(uMatrix, false, eyeMatrix);
                     gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 7);
                 }
             }
@@ -131,3 +135,4 @@
     </script>
 </body>
 </html>
+
