@@ -3,167 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <title>Swiftss VR Lab — Meta Quest 3S</title>
-    <!-- Подключаем официальное VR-ядро A-Frame для шлемов Meta Quest -->
+    <!-- Ультра-стабильное VR-ядро A-Frame под Quest 3S -->
     <script src="https://aframe.io"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #000; }
-    </style>
 </head>
-<body>
+<body style="margin: 0; overflow: hidden; background-color: #000;">
 
-    <!-- Главная 3D VR Сцена -->
     <a-scene xr-mode-ui="enabled: true">
         
-        /* Звездное хакерское небо вокруг */
-        <a-sky color="#050508"></a-sky>
+        <!-- Хакерское темное пространство лаборатории -->
+        <a-sky color="#040406"></a-sky>
 
-        /* Жесткий пол лаборатории FRUKT */
-        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#111116"></a-plane>
-        /* Сетка на полу для понимания масштаба в VR */
-        <a-grid color="#222"></a-grid>
+        <!-- Жесткий пол камеры тестов -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#0f0f13"></a-plane>
+        
+        <!-- Световая разметка на полу для VR масштаба -->
+        
+        
 
-        /* Тестовый Неоновый Куб прямо перед лицом (на расстоянии 3 метров, высота 1.5м) */
+        <!-- Тестовый Неоновый Куб (Кликни по нему лазером контроллера!) -->
         <a-box id="test-cube" 
-               position="0 1.5 -3" 
+               position="0 1.4 -2.5" 
                rotation="0 45 0" 
-               width="1" height="1" depth="1" 
+               width="0.6" height="0.6" depth="0.6" 
                color="#ff3333"
-               animation="property: rotation; to: 0 405 0; loop: true; dur: 5000; easing: linear">
+               animation="property: rotation; to: 0 405 0; loop: true; dur: 6000; easing: linear">
         </a-box>
 
-        <!-- СЮДА МЫ СЕЙЧАС ВСТАВИМ КУБИК 2 (КАМЕРУ И ТРЕКИНГ РУК-КОНТРОЛЛЕРОВ)... -->
-        <!-- ========================================================================= -->
-        <!-- === КУБИК 2: КАМЕРА ШЛЕМЫ И ТРЕКИНГ РУК-КОНТРОЛЛЕРОВ META QUEST 3S === -->
-        <!-- ========================================================================= -->
+        <!-- 3D МОДЕЛЬ KENTIS_DUMMY В ПОЛНЫЙ VR РОСТ -->
         
-        <!-- Подключаем плагин физических рук для взаимодействия с предметами -->
-        <script src="https://jsdelivr.net"></script>
-        <script src="https://unpkg.com"></script>
+            <!-- Голова и кастомный Горшок Кентиса -->
+            <a-sphere position="0 1.4 0" radius="0.15" color="#FFFFFF"></a-sphere>
+            <a-sphere position="0 1.46 0" radius="0.16" color="#141416" theta-length="90"></a-sphere>
+            
+            <!-- Футболка и перчатки -->
+            <a-cylinder position="0 0.95 0" radius="0.13" height="0.5" color="#16161a"></a-cylinder>
+            <a-cylinder position="-0.18 1.05 0" radius="0.035" height="0.35" color="#FFFFFF" rotation="0 0 20"></a-cylinder>
+            <a-sphere position="-0.23 0.88 0" radius="0.045" color="#111111"></a-sphere> 
 
-        <!-- Позиция игрока в комнате (Глаза на высоте ~1.6 метра) -->
-        
-            
-            
-            <!-- Левый контроллер Meta Quest 3S (С трекингом нажатия триггеров и физикой) -->
-            
-            
-            
-            <!-- Правый контроллер Meta Quest 3S -->
-            
-            
-        
-        <!-- ========================================================================= -->
-        <!-- === КУБИК 3: СОЗДАНИЕ 3D МОДЕЛЕЙ КЕНТИСА И КОТЕНКА НЮНИ В VR-РОСТ ===== -->
-        <!-- ========================================================================= -->
+            <a-cylinder position="0.18 1.05 0" radius="0.035" height="0.35" color="#FFFFFF" rotation="0 0 -20"></a-cylinder>
+            <a-sphere position="0.23 0.88 0" radius="0.045" color="#111111"></a-sphere>
 
-        <!-- 3D ГУМАНОИД KENTIS_DUMMY (Стоит чуть слева на расстоянии 2.5 метров) -->
-        
-            <!-- Голова (Белый шар) -->
-            <a-sphere position="0 1.5 0" radius="0.18" color="#FFFFFF" stroke="#000"></a-sphere>
-            <!-- Фирменная прическа Горшок-Оверсайз (Черный полушар сверху головы) -->
-            <a-sphere position="0 1.58 0" radius="0.19" color="#141416" theta-length="90" rotation="0 0 0"></a-sphere>
-            
-            <!-- Торс / Футболка (Черный вытянутый цилиндр) -->
-            <a-cylinder position="0 1.0 0" radius="0.15" height="0.6" color="#16161a"></a-cylinder>
-            
-            <!-- Левая рука с тактической перчаткой -->
-            <a-cylinder position="-0.22 1.1 0" radius="0.04" height="0.4" color="#FFFFFF" rotation="0 0 15"></a-cylinder>
-            <a-sphere position="-0.27 0.9 0" radius="0.05" color="#111111"></a-sphere> <!-- Перчатка -->
-
-            <!-- Правая рука с тактической перчаткой -->
-            <a-cylinder position="0.22 1.1 0" radius="0.04" height="0.4" color="#FFFFFF" rotation="0 0 -15"></a-cylinder>
-            <a-sphere position="0.27 0.9 0" radius="0.05" color="#111111"></a-sphere>
-
-            <!-- Таз и Штаны (Темно-серый куб-основание ног) -->
-            <a-box position="0 0.65 0" width="0.26" height="0.15" depth="0.15" color="#0b0b0d"></a-box>
-            
-            <!-- Левая Нога и Ботинок -->
-            <a-cylinder position="-0.08 0.35 0" radius="0.05" height="0.5" color="#FFFFFF"></a-cylinder>
-            <a-sphere position="-0.08 0.08 0.03" radius="0.06" color="#111111"></a-sphere> <!-- Обувь -->
-
-            <!-- Правая Нога и Ботинок -->
-            <a-cylinder position="0.08 0.35 0" radius="0.05" height="0.5" color="#FFFFFF"></a-cylinder>
-            <a-sphere position="0.08 0.08 0.03" radius="0.06" color="#111111"></a-sphere>
+            <!-- Штаны и ботинки -->
+            <a-box position="0 0.65 0" width="0.24" height="0.12" depth="0.12" color="#0b0b0d"></a-box>
+            <a-cylinder position="-0.07 0.35 0" radius="0.04" height="0.45" color="#FFFFFF"></a-cylinder>
+            <a-sphere position="-0.07 0.08 0.02" radius="0.05" color="#111111"></a-sphere>
+            <a-cylinder position="0.07 0.35 0" radius="0.04" height="0.45" color="#FFFFFF"></a-cylinder>
+            <a-sphere position="0.07 0.08 0.02" radius="0.05" color="#111111"></a-sphere>
         
 
-        <!-- 3D КОТЕНАК НЮНЯ (Маленький, сидит на полу чуть справа, высота ~25см) -->
+        <!-- 3D МОДЕЛЬ КОТЕНКА НЮНИ (Размер ровно в 2 строчки, ~25см) -->
         
-            <!-- Тело-овал (Белый вытянутый сфероид) -->
-            <a-sphere position="0 0.12 0" radius="0.12" scale="1 0.7 0.7" color="#FFFFFF"></a-sphere>
-            
-            <!-- Голова (Круглый белый шар) -->
-            <a-sphere position="-0.12 0.18 0" radius="0.08" color="#FFFFFF"></a-sphere>
-            
-            <!-- Розовые Ушки треугольниками -->
-            <a-cone position="-0.16 0.25 0.03" radius-bottom="0.02" height="0.05" color="#ffb3c1" rotation="0 0 20"></a-cone>
-            <a-cone position="-0.12 0.25 -0.03" radius-bottom="0.02" height="0.05" color="#ffb3c1" rotation="0 0 -20"></a-cone>
-
-            <!-- 4 маленькие лапки -->
-            <a-cylinder position="-0.06 0.04 0.04" radius="0.015" height="0.08" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="-0.06 0.04 -0.04" radius="0.015" height="0.08" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="0.06 0.04 0.04" radius="0.015" height="0.08" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="0.06 0.04 -0.04" radius="0.015" height="0.08" color="#FFFFFF"></a-cylinder>
-
-            <!-- Тонкий закрученный хвостик -->
-            <a-cylinder position="0.11 0.16 0" radius="0.01" height="0.12" color="#000000" rotation="45 0 0"></a-cylinder>
+            <a-sphere position="0 0.1 0" radius="0.1" scale="1 0.7 0.7" color="#FFFFFF"></a-sphere>
+            <a-sphere position="-0.1 0.15 0" radius="0.07" color="#FFFFFF"></a-sphere>
+            <!-- Розовые Ушки -->
+            <a-cone position="-0.13 0.21 0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 15"></a-cone>
+            <a-cone position="-0.1 0.21 -0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 -15"></a-cone>
+            <!-- Лапки и хвост -->
+            <a-cylinder position="-0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
+            <a-cylinder position="-0.05 0.03 -0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
+            <a-cylinder position="0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
+            <a-cylinder position="0.05 0.03 -0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
+            <a-cylinder position="0.09 0.13 0" radius="0.008" height="0.1" color="#000000" rotation="45 0 0"></a-cylinder>
         
-        <!-- ========================================================================= -->
-        <!-- === КУБИК 4: ГРАВИТАЦИЯ, ФИЗИЧЕСКИЕ СВОЙСТВА И СТОЛКНОВЕНИЯ С ПОЛОМ === -->
-        <!-- ========================================================================= -->
 
-        <!-- Перезаписываем свойства сцены для активации гравитационного движка -->
-        <script>
-            // Добавляем динамическую физику телам Кентиса и Нюни
-            document.querySelector('#vr-kentis').setAttribute('dynamic-body', 'shape: box; mass: 5; linearDamping: 0.1; angularDamping: 0.1');
-            document.querySelector('#vr-nyunya').setAttribute('dynamic-body', 'shape: box; mass: 1; linearDamping: 0.1; angularDamping: 0.1');
-            
-            // Настраиваем пол как непробиваемую статичную физическую преграду
-            document.querySelector('a-plane').setAttribute('static-body', '');
-        </script>
-        <!-- ========================================================================= -->
-        <!-- === КУБИК 5: ПАРЯЩИЙ VR-ТЕРМИНАЛ МОНИТОРИНГА И ЗАКРЫТИЕ СЦЕНЫ ======== -->
-        <!-- ========================================================================= -->
-
-        <!-- Голографический монитор FRUKT, висящий в воздухе рядом с Кентисом -->
+        <!-- ПАРЯЩИЙ НЕОНОВЫЙ VR-МОНИТОР FRUKT -->
         
-            <!-- Задняя панель экрана (Темная полупрозрачная) -->
-            <a-plane width="1.5" height="0.8" color="#0e0606" opacity="0.85" material="shader: flat"></a-plane>
-            <!-- Тонкая неоново-красная рамка экрана -->
-            <a-box width="1.52" height="0.82" depth="0.01" color="#ff3333" wireframe="true" material="shader: flat"></a-box>
+            <a-plane width="1.4" height="0.7" color="#0a0404" opacity="0.9"></a-plane>
+            <a-box width="1.42" height="0.72" depth="0.005" color="#ff3333" wireframe="true"></a-box>
             
-            <!-- Заголовки и логи терминала прямо в VR -->
-            <a-text value="KENTISS_VR_MONITOR_v1.0" position="-0.7 0.3 0.01" color="#ff3333" width="3.0" font="mozillavr"></a-text>
-            <a-text value="> AI_BRAIN: 100% (ACTIVE)" position="-0.7 0.1 0.01" color="#00ff66" width="2.4" font="mozillavr"></a-text>
-            <a-text value="> HEART_HP: 100% (75 BPM)" position="-0.7 -0.05 0.01" color="#00ff66" width="2.4" font="mozillavr"></a-text>
-            <a-text value="> BLOOD_VOL: 100% (5.0L)" position="-0.7 -0.2 0.01" color="#00ff66" width="2.4" font="mozillavr"></a-text>
-            <a-text value="* CONTROLLERS: ATTACHED" position="-0.7 -0.32 0.01" color="#ff9900" width="1.8" font="mozillavr"></a-text>
+            <a-text value="KENTISS_VR_MONITOR_v2.0" position="-0.65 0.25 0.01" color="#ff3333" width="2.8"></a-text>
+            <a-text id="txt-brain" value="> AI_BRAIN: 100% (ACTIVE)" position="-0.65 0.05 0.01" color="#00ff66" width="2.2"></a-text>
+            <a-text id="txt-heart" value="> HEART_HP: 100% (75 BPM)" position="-0.65 -0.1 0.01" color="#00ff66" width="2.2"></a-text>
+            <a-text id="txt-blood" value="> DUMMY_STATUS: STABLE" position="-0.65 -0.25 0.01" color="#ff9900" width="1.8"></a-text>
+        
+
+        <!-- НАСТРОЙКА ТРЕКИНГА КАМЕРЫ И ЛАЗЕРНЫХ КОНТРОЛЛЕРОВ QUEST 3S -->
+        
+            
+            <!-- Левый лазерный указатель -->
+            
+            <!-- Правый лазерный указатель -->
+            
         
 
     </a-scene>
 
     <script>
-        // ИИ-логика отслеживания ударов в VR пространстве
-        const kentisEntity = document.querySelector('#vr-kentis');
-        
-        // Вешаем прослушку физических столкновений Кентиса с полом внутри движка A-Frame
-        kentisEntity.addEventListener('collide', function (e) {
-            // Вычисляем силу удара по скорости сближения объектов
-            let relativeVelocity = e.detail.contact.getImpactVelocityAlongNormal();
+        // Интерактивный клик лазером контроллера по кубу (Проверка работы WebXR)
+        const cube = document.querySelector('#test-cube');
+        cube.addEventListener('click', function () {
+            // При клике триггером контроллера — куб взрывается хоррор-красным цветом!
+            cube.setAttribute('color', '#2b0000');
             
-            if (relativeVelocity > 5) {
-                // Изменяем текст на летающем 3D-мониторе в реальном времени при жестком ударе!
-                const texts = document.querySelectorAll('#vr-monitor a-text');
-                texts[1].setAttribute('value', '> AI_BRAIN: 0% (CRITICAL_FAILURE)');
-                texts[1].setAttribute('color', '#ff0000');
-                texts[2].setAttribute('value', '> HEART_HP: 0% (0 BPM)');
-                texts[2].setAttribute('color', '#ff0000');
-                texts[3].setAttribute('value', '> BLOOD_VOL: 0% (0.00L)');
-                texts[3].setAttribute('color', '#ff0000');
-                
-                // Перекрашиваем Кентиса в багровый цвет хоррор-взлома 2012!
-                const parts = kentisEntity.querySelectorAll('a-sphere, a-cylinder, a-box');
-                parts.forEach(part => part.setAttribute('color', '#2b0000'));
-            }
+            // На мониторе вылетает лог критического сбоя FRUKT-лаборатории
+            document.querySelector('#txt-brain').setAttribute('value', '> AI_BRAIN: 0% (CRITICAL_ERROR)');
+            document.querySelector('#txt-brain').setAttribute('color', '#ff0000');
+            document.querySelector('#txt-heart').setAttribute('value', '> HEART_HP: 0% (0 BPM)');
+            document.querySelector('#txt-heart').setAttribute('color', '#ff0000');
+            document.querySelector('#txt-blood').setAttribute('value', '> DUMMY_STATUS: CLINICAL_DEATH');
+            document.querySelector('#txt-blood').setAttribute('color', '#ff0000');
+
+            // Перекрашиваем Кентиса в хоррор-скин воксельной смерти
+            document.querySelectorAll('#vr-kentis *').forEach(part => {
+                if(part.tagName.toLowerCase() !== 'a-entity') part.setAttribute('color', '#2b0000');
+            });
         });
     </script>
 </body>
