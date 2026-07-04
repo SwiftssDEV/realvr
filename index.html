@@ -1,80 +1,167 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Swiftss VR Lab V6 — Meta Quest 3S</title>
-    <!-- Локальное VR-ядро, которое Гитхаб и Квест больше не заблокируют! -->
-    <script src="aframe.min.js"></script>
-</head>
-<body style="margin: 0; overflow: hidden; background-color: #000;">
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TesseractDEVS — Project J Quest 3S VR v39.5</title>
+<style>
+    body,html{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:monospace;user-select:none;}
+    canvas{display:block;width:100vw;height:100vh;position:absolute;top:0;left:0;z-index:1;}
+    #main-menu{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,20,0.98);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+    .menu-box{border:3px solid #0f6;padding:30px 60px;background:#000;border-radius:8px;text-align:center;box-shadow:0 0 30px #0f6;}
+    .m-btn{background:#111;color:#0f6;border:2px solid #0f6;padding:14px 40px;margin:15px 0 5px 0;font-size:16px;font-family:monospace;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(0,255,102,0.2);font-weight:bold;width:100%;box-sizing:border-box;}
+    .m-btn:hover{background:#0f6;color:#000;box-shadow:0 0 25px #0f6;transform:scale(1.02);}
+    #hud{position:absolute;top:20px;left:20px;color:#000;background:rgba(255,255,255,0.92);padding:12px;border:3px solid #000;border-radius:6px;z-index:10;width:340px;font-size:11px;display:none;}
+    #spawn-menu{position:fixed;top:10%;left:5%;width:90%;height:80%;background:rgba(255,255,255,0.98);border:3px solid #000;border-radius:8px;z-index:999;display:none;padding:20px;box-sizing:border-box;color:#000;}
+    .s-sidebar{width:25%;float:left;height:100%;border-right:2px solid #000;padding-right:10px;}
+    .s-content{width:70%;float:right;height:100%;padding-left:20px;overflow-y:auto;}
+    .cat-btn{width:100%;background:#f0f0f0;border:2px solid #000;padding:10px;margin-bottom:6px;cursor:pointer;font-family:monospace;font-weight:bold;text-align:left;color:#000;}
+    .cat-btn:hover,.cat-btn.active{background:#000;color:#fff;}
+    .grid-item{display:inline-block;width:90px;height:90px;background:#eee;border:2px solid #000;margin:6px;border-radius:4px;text-align:center;line-height:90px;font-size:28px;cursor:pointer;font-weight:bold;}
+    .grid-item:hover{background:#000;color:#fff;}
+</style></head><body>
+    <div id="main-menu"><div class="menu-box">
+        <h1 style="color:#0f6;font-size:28px;text-shadow:0 0 15px #0f6;letter-spacing:3px;margin:0 0 10px 0;">J-MOD VR_EDITION v39.5</h1>
+        <p style="color:#8af;font-size:11px;margin:0 0 20px 0;font-weight:bold;">Р.И.С. — ТРИ КУБИКА ОПТИМИЗАЦИИ ПОД QUEST 3S 🕶️</p>
+        <button class="m-btn" onclick="startVRMode()">🕶️ ЗАПУСТИТЬ В ШЛЕМЕ QUEST 3S</button>
+        <button class="m-btn" style="border-color:#8af;color:#8af;" onclick="startSandbox2D()">📺 ИГРАТЬ НА МОНИТОРЕ (2D)</button>
+        <p style="color:#555;font-size:10px;margin-top:15px;">M-REALITY ENGINE BY TesseractDEVS © 2026</p>
+    </div></div>
+    <div id="hud">
+        <h1 style="margin:0 0 5px 0;font-size:13px;color:#ff5500;">📋 TESSERACT_VR_HUD v39.5</h1>
+        <p style="margin:4px 0;">> КИБЕР-ИНСТРУМЕНТ: <span id="tool-txt" style="color:#3366ff;font-weight:bold;">Touch Plus Контроллеры 🕹️</span></p>
+        <p style="margin:4px 0;">> РЕЖИМ QUEST 3S: <span id="vr-status" style="color:#0a0;font-weight:bold;">Синхронизация...</span></p>
+        <p style="margin:4px 0;">> ОБЪЕКТОВ НА КАРТЕ: <span id="c-txt" style="color:#0a0;font-weight:bold;">0</span></p>
+        <p style="margin-top:6px;color:#444;font-size:10px;line-height:1.3;">* В VR зажми боковой триггер (Grip) для захвата Джеев руками! ✋<br>* Инструмент Иголка [🪡] натягивает Торчур-верёвки!<br>* Клавиша [Q] на ПК открывает спавн-меню на мониторе!</p>
+    </div>
+    <div id="spawn-menu"><div class="s-sidebar">
+        <h2 style="font-size:13px;margin-top:0;text-transform:uppercase;">VR Спавнер:</h2>
+        <button class="cat-btn active" id="b-props" onclick="setCat('props')">🧱 КАНВАС БЛОКИ</button>
+        <button class="cat-btn" id="b-weapons" onclick="setCat('weapons')">🔫 ОРУЖИЕ И БОЧКИ</button>
+        <button class="cat-btn" id="b-npc" onclick="setCat('npc')">🤠 КЛОНЫ ДЖЕЯ НА УЙ</button>
+        <button class="cat-btn" id="b-tools" onclick="setCat('tools')">🪡 ИНСТРУМЕНТЫ</button>
+    </div><div class="s-content" id="spawn-content"></div></div>
+    <canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+function res(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}window.addEventListener('resize',res);res();
+window.addEventListener('contextmenu',e=>e.preventDefault());
+let items=[],ropes=[],keys={},mx=0,my=0,wTime=0,isGameActive=false,curCat='props',currentTool='grab',isNpcAfk=false,ropeStartObj=null,isViewingMicroscope=false;
+let cam={x:0,y:0},isVR=false,xrSession=null,xrRefSpace=null;
+let vrControllers={left:{x:-60,y:60,active:false,grabObj:null},right:{x:60,y:60,active:false,grabObj:null}};
+let propsDB={props:[{e:"🧱",t:"block"},{e:"📦",t:"box"}],weapons:[{e:"🔫",t:"weapon_rifle"},{e:"🔥",t:"barrel_fire"}],npc:[{e:"🤠",t:"j_npc"},{e:"🐱",t:"canvas_cat"},{e:"🔬",t:"microscope"}],tools:[{e:"🪡",t:"needle"},{e:"✋",t:"grab"},{e:"🧼",t:"eraser"}]};
+function initMenuChaos(){
+    for(let i=0;i<5;i++)items.push({x:(Math.random()-0.5)*400,y:-100,ox:0,oy:-100,vx:(Math.random()-0.5)*3,vy:0,type:'box',emoji:'📦',r:15,grab:'N',npcAng:0,npcVx:0});
+    for(let i=0;i<3;i++)items.push({x:(Math.random()-0.5)*300,y:-50,ox:0,oy:-50,vx:0.4,vy:0,type:'j_npc',emoji:'🤠',r:18,grab:'N',npcAng:0,npcVx:0.4});
+}
+function startVRMode(){
+    if(navigator.xr){
+        navigator.xr.requestSession('immersive-vr',{requiredFeatures:['local-floor']}).then(session=>{
+            xrSession=session;isVR=true;document.getElementById('main-menu').style.display='none';
+            document.getElementById('hud').style.display='block';isGameActive=true;
+            document.getElementById('vr-status').innerText="QUEST 3S ПОДКЛЮЧЕН ✅";
+            session.requestReferenceSpace('local-floor').then(space=>{xrRefSpace=space;session.requestAnimationFrame(vrLoop);});
+        }).catch(err=>{alert("Шлем Quest 3S не найден! Включаю режим монитора (2D).");startSandbox2D();});
+    }else{startSandbox2D();}
+}
+function startSandbox2D(){document.getElementById('main-menu').style.display='none';document.getElementById('hud').style.display='block';isGameActive=true;document.getElementById('vr-status').innerText="2D РЕЖИМ МОНИТОРА 📺";items=[];ropes=[];triggerSpawn('block','🧱');}
+canvas.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;if(!isVR){vrControllers.right.x=mx-canvas.width/2;vrControllers.right.y=my-canvas.height/2;}});
+window.addEventListener('mouseup',e=>{if(!isVR){if(e.button===0){vrControllers.left.active=false;items.forEach(s=>{if(s.grab==='L')s.grab='N';});}if(e.button===2){vrControllers.right.active=false;items.forEach(s=>{if(s.grab==='R')s.grab='N';});}}});
+window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+function limH(bx,by,h,tx,ty){let dx=tx-bx,dy=ty-by,dist=Math.sqrt(dx*dx+dy*dy),mR=75;if(dist>mR){h.x=bx+(dx/dist)*mR;h.y=by+(dy/dist)*mR;}else{h.x=tx;h.y=ty;}}
+        function setCat(c){curCat=c;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));let a=document.getElementById('b-'+c);if(a)a.classList.add('active');renderSpawnContent();}
+        function renderSpawnContent(){let div=document.getElementById('spawn-content');if(!div)return;let html="";propsDB[curCat].forEach(i=>{html+="<div class=\"grid-item\" onclick=\"triggerSpawn('" + i.t + "','" + i.e + "')\">" + i.e + "</div>";});div.innerHTML=html;}
+        function triggerSpawn(t,e){
+            document.getElementById('spawn-menu').style.display='none';
+            if(t==='needle'||t==='eraser'||t==='grab'){currentTool=t;document.getElementById('tool-txt').innerText=t==='needle'?"Иголка Верёвок 🪡":(t==='eraser'?"Ластик 🧼":"Руки-Грабберы ✋");return;}
+            let wX=isVR?vrControllers.right.x:mx-canvas.width/2,wY=isVR?vrControllers.right.y:my-canvas.height/2;
+            items.push({x:wX,y:wY,ox:wX,oy:wY,vx:0,vy:0,type:t,emoji:e,r:t==='block'?22:(t==='canvas_cat'?14:16),npcVx:0.4,npcAng:0,grab:'N'});
+            document.getElementById('c-txt').innerText=items.length;
+        }
+        function interactEvent(){
+            if(isViewingMicroscope){isViewingMicroscope=false;return;}
+            items.forEach(i=>{
+                if(i.type==='microscope'&&Math.sqrt((vrControllers.right.x-i.x)**2+(vrControllers.right.y-i.y)**2)<50){isViewingMicroscope=true;return;}
+                if(Math.sqrt((vrControllers.right.x-i.x)**2+(vrControllers.right.y-i.y)**2)<80){i.vx+=(i.x-vrControllers.right.x>0?9:-7);i.vy-=5;}
+            });
+        }
+        window.addEventListener('keydown',e=>{
+            let k=e.key.toLowerCase();keys[k]=true;if(!isGameActive)return;
+            if(k==='q'||k==='й'){let m=document.getElementById('spawn-menu');if(m.style.display=='block'){m.style.display='none';}else{m.style.display='block';renderSpawnContent();}}
+        });
+        window.addEventListener('mousedown',e=>{
+            if(isVR||!isGameActive)return;let mWorldX=mx-canvas.width/2,mWorldY=my-canvas.height/2;
+            if(e.button===0){
+                vrControllers.left.active=true;
+                if(currentTool==='needle'){
+                    let clickedObj=items.find(s=>Math.sqrt((mWorldX-s.x)**2+(mWorldY-s.y)**2)<s.r+15);
+                    if(clickedObj){
+                        if(!ropeStartObj){ropeStartObj=clickedObj;}
+                        else if(ropeStartObj!==clickedObj){ropes.push({a:ropeStartObj,b:clickedObj,len:Math.sqrt((ropeStartObj.x-clickedObj.x)**2+(ropeStartObj.y-clickedObj.y)**2)});ropeStartObj=null;}
+                    }
+                    return;
+                }
+                if(!items.some(i=>i.grab==='L')){let target=items.find(s=>s.grab==='N'&&Math.sqrt((mWorldX-s.x)**2+(mWorldY-s.y)**2)<s.r+18);if(target)target.grab='L';}
+            }
+            if(e.button===2){vrControllers.right.active=true;let target=items.find(s=>s.grab==='N'&&Math.sqrt((mWorldX-s.x)**2+(mWorldY-s.y)**2)<s.r+18);if(target)target.grab='R';}
+        });
+        function processVRInputs(frame){
+            let session=frame.session;
+            for(let source of session.inputSources){
+                if(!source.gamepad)continue;let hand=source.handedness;let ctrl=vrControllers[hand];if(!ctrl)continue;
+                let gripBtn=source.gamepad.buttons[1];let triggerBtn=source.gamepad.buttons[0];
+                if(gripBtn&&gripBtn.pressed){
+                    ctrl.active=true;
+                    if(!ctrl.grabObj){let target=items.find(s=>s.grab==='N'&&Math.sqrt((ctrl.x-s.x)**2+(ctrl.y-s.y)**2)<s.r+20);if(target){ctrl.grabObj=target;target.grab=hand==='left'?'L':'R';}}
+                }else{ctrl.active=false;if(ctrl.grabObj){ctrl.grabObj.grab='N';ctrl.grabObj=null;}}
+                if(triggerBtn&&triggerBtn.pressed&&currentTool==='needle'){
+                    let clicked=items.find(s=>Math.sqrt((ctrl.x-s.x)**2+(ctrl.y-s.y)**2)<s.r+20);
+                    if(clicked){
+                        if(!ropeStartObj){ropeStartObj=clicked;}
+                        else if(ropeStartObj!==clicked){ropes.push({a:ropeStartObj,b:clicked,len:Math.sqrt((ropeStartObj.x-clicked.x)**2+(ropeStartObj.y-clicked.y)**2)});ropeStartObj=null;}
+                    }
+                }
+            }
+        }
+        function dP(ctx,x,y,isNpc,npcAng){
+            ctx.save();ctx.translate(x,y);let ang=isNpc?npcAng:Math.atan2(vrControllers.right.y-y,vrControllers.right.x-x);let f=Math.abs(ang)>Math.PI/2;
+            ctx.fillStyle="#ffeb80";ctx.strokeStyle="#000";ctx.lineWidth=3.5;ctx.beginPath();ctx.arc(0,18,20,0,Math.PI,true);ctx.fill();ctx.stroke();
+            ctx.fillStyle="#ffd4c2";ctx.beginPath();ctx.arc(0,-2,17,0,Math.PI*2);ctx.fill();ctx.stroke();
+            ctx.save();if(f)ctx.scale(-1,1);ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-5,-5,3.8,0,Math.PI*2);ctx.arc(6,-5,3.8,0,Math.PI*2);ctx.fill();ctx.stroke();
+            ctx.fillStyle="#000";ctx.beginPath();ctx.arc(f?-7:-3,-5,2.2,0,Math.PI*2);ctx.arc(f?4:8,-5,2.2,0,Math.PI*2);ctx.fill();
+            ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-6,6);ctx.quadraticCurveTo(2,9,8,4);ctx.stroke();
+            ctx.fillStyle="#4a5a6a";ctx.beginPath();ctx.arc(0,-10,17,Math.PI,0);ctx.fill();ctx.stroke();
+            ctx.fillStyle="#2c3540";ctx.fillRect(0,-13,24,5);ctx.strokeRect(0,-13,24,5);ctx.restore();ctx.restore();
+        }
+        function drawCanvasWeapon(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.fillStyle="#222";ctx.strokeStyle="#000";ctx.lineWidth=2.5;ctx.fillRect(-18,-4,36,7);ctx.fillRect(-6,3,4,10);ctx.fillStyle="#964b00";ctx.fillRect(-22,-4,6,12);ctx.restore();}
+        function drawCanvasBarrel(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.fillStyle="#cc3333";ctx.strokeStyle="#000";ctx.lineWidth=3;ctx.fillRect(-14,-18,28,36);ctx.strokeRect(-14,-18,28,36);ctx.restore();}
+        function drawScene(ctx){
+            ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.strokeStyle="#000";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,canvas.height/2+250);ctx.lineTo(canvas.width,canvas.height/2+250);ctx.stroke();
+            ctx.lineWidth=2;
+            ropes.forEach(r=>{ctx.beginPath();ctx.moveTo(canvas.width/2+r.a.x,canvas.height/2+r.a.y);ctx.lineTo(canvas.width/2+r.b.x,canvas.height/2+r.b.y);ctx.stroke();});
+            items.forEach(s=>{
+                let scrX=canvas.width/2+s.x,scrY=canvas.height/2+s.y;
+                if(s.type==='block'){ctx.save();ctx.translate(scrX,scrY);ctx.fillStyle="#cc5533";ctx.strokeStyle="#000";ctx.lineWidth=2.5;ctx.fillRect(-20,-20,40,40);ctx.strokeRect(-20,-20,40,40);ctx.restore();
+                }else if(s.type==='box'){ctx.save();ctx.translate(scrX,scrY);ctx.fillStyle="#d2a679";ctx.strokeStyle="#000";ctx.lineWidth=2.5;ctx.fillRect(-15,-15,30,30);ctx.strokeRect(-15,-15,30,30);ctx.restore();
+                }else if(s.type==='weapon_rifle'){drawCanvasWeapon(ctx,scrX,scrY);
+                }else if(s.type==='barrel_fire'){drawCanvasBarrel(ctx,scrX,scrY);
+                }else if(s.type==='microscope'){ctx.save();ctx.translate(scrX,scrY);ctx.fillStyle="#444";ctx.fillRect(-6,-10,12,20);ctx.fillStyle="#000";ctx.fillRect(-10,10,20,3);ctx.restore();
+                }else if(s.type==='j_npc'){dP(ctx,scrX,scrY,true,s.npcAng);
+                }else if(s.type==='canvas_cat'){
+                    ctx.save();ctx.translate(scrX,scrY);ctx.lineWidth=2.5;ctx.strokeStyle="#000";ctx.fillStyle="#fff";
+                    ctx.beginPath();ctx.arc(-8,4,6,0,Math.PI*2);ctx.arc(4,4,6,0,Math.PI*2);ctx.arc(8,-6,7,0,Math.PI*2);ctx.fill();ctx.stroke();
+                    ctx.beginPath();ctx.moveTo(4,-12);ctx.lineTo(5,-18);ctx.moveTo(11,-12);ctx.lineTo(13,-18);ctx.stroke();
+                    ctx.beginPath();ctx.moveTo(-8,10);ctx.lineTo(-8,16);ctx.moveTo(0,10);ctx.lineTo(0,16);ctx.moveTo(6,10);ctx.lineTo(6,16);ctx.stroke();ctx.beginPath();ctx.moveTo(-14,4);ctx.lineTo(-22,-2);ctx.stroke();ctx.restore();
+                }
+            });
+            ctx.fillStyle="#0f6";ctx.beginPath();ctx.arc(canvas.width/2+vrControllers.left.x,canvas.height/2+vrControllers.left.y,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(canvas.width/2+vrControllers.right.x,canvas.height/2+vrControllers.right.y,6,0,Math.PI*2);ctx.fill();
+        }
+        function physicalUpdate(){
+            ropes.forEach(r=>{let dx=r.b.x-r.a.x,dy=r.b.y-r.a.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist>r.len){let diff=r.len-dist,p=(diff/dist)*0.3,fX=dx*p,fY=dy*p;if(r.a.type!=='block'){r.a.x-=fX;r.a.y-=fY;}if(r.b.type!=='block'){r.b.x+=fX;r.b.y+=fY;}}});
+            for(let idx=items.length-1;idx>=0;idx--){
+                let s=items[idx];if(s.type==='j_npc'&&s.grab==='N'){if(!isNpcAfk){s.x+=s.npcVx;if(Math.random()>0.98){s.npcVx=(Math.random()>0.5?0.5:-0.5);s.npcAng=s.npcVx>0?0:Math.PI;}}}
+                if(s.grab==='L'){s.x=vrControllers.left.x;s.y=vrControllers.left.y;}else if(s.grab==='R'){s.x=vrControllers.right.x;s.y=vrControllers.right.y;}
+                else if(s.type!=='block'){s.vy+=0.22;s.x+=s.vx;s.y+=s.vy;if(s.y>230){s.y=230;s.vy*=-0.3;s.vx*=0.9;}}
+            }
+        }
+        function pcLoop(){if(!isVR&&isGameActive){physicalUpdate();drawScene(ctx);requestAnimationFrame(pcLoop);}}
+        function vrLoop(time,frame){let session=frame.session;session.requestAnimationFrame(vrLoop);let pose=frame.getViewerPose(xrRefSpace);if(pose){processVRInputs(frame);physicalUpdate();for(let view of pose.views){drawScene(ctx);}}}
+        initMenuChaos();isGameActive=false;setInterval(()=>{if(!isGameActive){drawScene(ctx);}},16);
+</script></body></html>
 
-    <a-scene xr-mode-ui="enabled: true">
-        
-        <a-sky color="#040406"></a-sky>
-
-        <!-- Жесткий пол лаборатории -->
-        <a-plane position="0 0 0" rotation="-90 0 0" width="50" height="50" color="#0f0f13"></a-plane>
-        
-        <!-- Зеленая разметка пола для калибровки трекинга Quest 3S -->
-        
-        </a-weight>
-        
-        
-
-        <!-- 3D МОДЕЛЬ KENTIS_DUMMY В ПОЛНЫЙ VR РОСТ -->
-        
-            <a-sphere position="0 1.4 0" radius="0.15" color="#FFFFFF"></a-sphere>
-            
-            <!-- Легендарный Epic Face в VR пространстве -->
-            <a-ring position="-0.05 1.42 0.13" radius-inner="0.01" radius-outer="0.03" color="#000000" theta-length="180" theta-start="180"></a-ring>
-            <a-ring position="0.06 1.42 0.13" radius-inner="0.01" radius-outer="0.03" color="#000000" theta-length="180" theta-start="180"></a-ring>
-            <a-ring position="0 1.34 0.13" radius-inner="0" radius-outer="0.06" color="#801830" theta-length="180" theta-start="180"></a-ring>
-
-            <!-- Фирменная прическа Горшок -->
-            <a-sphere position="0 1.46 0" radius="0.16" color="#141416" theta-length="90"></a-sphere>
-            <a-cylinder position="0 0.95 0" radius="0.13" height="0.5" color="#16161a"></a-cylinder>
-            
-            <a-cylinder position="-0.18 1.05 0" radius="0.035" height="0.35" color="#FFFFFF" rotation="0 0 20"></a-cylinder>
-            <a-sphere position="-0.23 0.88 0" radius="0.045" color="#111111"></a-sphere> 
-
-            <a-cylinder position="0.18 1.05 0" radius="0.035" height="0.35" color="#FFFFFF" rotation="0 0 -20"></a-cylinder>
-            <a-sphere position="0.23 0.88 0" radius="0.045" color="#111111"></a-sphere>
-
-            <a-box position="0 0.65 0" width="0.24" height="0.12" depth="0.12" color="#0b0b0d"></a-box>
-            <a-cylinder position="-0.07 0.35 0" radius="0.04" height="0.45" color="#FFFFFF"></a-cylinder>
-            <a-sphere position="-0.07 0.08 0.02" radius="0.05" color="#111111"></a-sphere>
-            <a-cylinder position="0.07 0.35 0" radius="0.04" height="0.45" color="#FFFFFF"></a-cylinder>
-            <a-sphere position="0.07 0.08 0.02" radius="0.05" color="#111111"></a-sphere>
-        
-
-        <!-- 3D МОДЕЛЬ КОТЕНКА НЮНИ В 2 СТРОЧКИ ВЫСОТОЙ -->
-        
-            <a-sphere position="0 0.1 0" radius="0.1" scale="1 0.7 0.7" color="#FFFFFF"></a-sphere>
-            <a-sphere position="-0.1 0.15 0" radius="0.07" color="#FFFFFF"></a-sphere>
-            <a-cone position="-0.13 0.21 0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 15"></a-cone>
-            <a-cone position="-0.1 0.21 -0.02" radius-bottom="0.015" height="0.04" color="#ffb3c1" rotation="0 0 -15"></a-cone>
-            
-            <a-cylinder position="-0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="-0.05 0.03 -0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="0.05 0.03 0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
-            <a-cylinder position="0.05 0.03 -0.03" radius="0.012" height="0.06" color="#FFFFFF"></a-cylinder>
-            
-            <a-cylinder position="0.09 0.13 0" radius="0.008" height="0.1" color="#000000" rotation="45 0 0"></a-cylinder>
-        
-
-        <!-- ПАРЯЩИЙ VR-МОНИТОР FRUKT -->
-        
-            <a-plane width="1.2" height="0.6" color="#0a0404" opacity="0.85"></a-plane>
-            <a-box width="1.22" height="0.62" depth="0.005" color="#ff3333" wireframe="true"></a-box>
-            <a-text value="KENTISS_VR_MONITOR_v6.0" position="-0.55 0.2 0.01" color="#ff3333" width="2.4"></a-text>
-            <a-text value="> AI_BRAIN: 100% (STABLE)" position="-0.55 0.05 0.01" color="#00ff66" width="1.8"></a-text>
-            <a-text value="> HEART_HP: 100% (75 BPM)" position="-0.55 -0.05 0.01" color="#00ff66" width="1.8"></a-text>
-            <a-text value="> QUEST_3S: LOCAL_LINK" position="-0.55 -0.18 0.01" color="#ff9900" width="1.5"></a-text>
-        
-
-        
-
-    </a-scene>
-
-</body>
-</html>
