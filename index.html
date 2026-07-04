@@ -164,4 +164,3 @@ function limH(bx,by,h,tx,ty){let dx=tx-bx,dy=ty-by,dist=Math.sqrt(dx*dx+dy*dy),m
         function vrLoop(time,frame){let session=frame.session;session.requestAnimationFrame(vrLoop);let pose=frame.getViewerPose(xrRefSpace);if(pose){processVRInputs(frame);physicalUpdate();for(let view of pose.views){drawScene(ctx);}}}
         initMenuChaos();isGameActive=false;setInterval(()=>{if(!isGameActive){drawScene(ctx);}},16);
 </script></body></html>
-
